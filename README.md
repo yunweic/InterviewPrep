@@ -1,6 +1,6 @@
 # InterviewPrep
 
-A personal C# reference for LeetCode / interview prep. Not a production app — `InterviewPrep/Program.cs` is a single growing file that demonstrates the C# language features and collection APIs most useful for solving LeetCode problems (arrays, `List<T>`, `Dictionary<T,K>`, `HashSet<T>`, `Stack<T>`, nullable operators, etc.), one topic at a time.
+A personal C# reference for LeetCode / interview prep. Not a production app — each C# language feature or collection type useful for LeetCode (arrays, `List<T>`, `Dictionary<T,K>`, `HashSet<T>`, `Stack<T>`/`Queue<T>`, linked lists, trees, sorting, heaps, etc.) gets its own file with a `Run()` method, and `Program.cs` just calls each one in order.
 
 Also see [`AI_PROFICIENCY.md`](AI_PROFICIENCY.md) — a running reference of what I've learned about working effectively with Claude Code while building this repo.
 
