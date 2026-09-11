@@ -1,0 +1,8 @@
+#!/bin/sh
+echo "Running dotnet format check..."
+dotnet format --verify-no-changes
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "Formatting check failed. Run 'dotnet format' to fix, then re-commit."
+    exit 1
+fi
