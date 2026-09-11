@@ -1,0 +1,10 @@
+# Build artifacts
+bin/
+obj/
+
+# Rider / .NET IDE
+.idea/
+*.user
+
+# OS
+.DS_Store
