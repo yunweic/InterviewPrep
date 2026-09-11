@@ -18,3 +18,8 @@ A personal C# reference/practice repo for LeetCode and interview prep — not a 
 - `dotnet build` / `dotnet run --project InterviewPrep` from the repo root.
 - `dotnet format` applies the `.editorconfig` style rules.
 - Roslyn analyzers are enabled (`EnableNETAnalyzers`, `AnalysisLevel=latest`). `CA1051` (public fields) and `CA1050` (no namespace) are suppressed in the `.csproj` — LeetCode-provided types like `ListNode`/`TreeNode` intentionally use public fields with no namespace, so don't "fix" that pattern.
+
+## Formatting enforcement
+
+- A pre-commit hook (`.githooks/pre-commit`) runs `dotnet format --verify-no-changes` and blocks the commit if anything's unformatted. It's version-controlled, but `core.hooksPath` is a local git config setting — a fresh clone needs to run `git config core.hooksPath .githooks` once to activate it.
+- `.github/workflows/ci.yml` runs the same format check plus a build on every PR into `main` and on pushes to `main`, so formatting is enforced even without the local hook.
