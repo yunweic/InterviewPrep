@@ -11,7 +11,7 @@
         <!-- LeetCode-provided types (e.g. ListNode/TreeNode) intentionally use public fields with no namespace -->
         <!-- ToUpper/ToLower/StartsWith etc. intentionally use the plain overloads you'd actually write
              in an interview, not the culture-aware ones (StringComparison.Ordinal, CultureInfo) -->
-        <NoWarn>CA1051;CA1050;CA1304;CA1310;CA1311</NoWarn>
+        <NoWarn>CA1051;CA1050;CA1304;CA1305;CA1310;CA1311</NoWarn>
     </PropertyGroup>
 
 </Project>

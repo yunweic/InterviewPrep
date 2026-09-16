@@ -2,13 +2,30 @@
 {
     public static void Run()
     {
-        // create a dictionary
+        // create a dictionary — index-initializer syntax `[key] = value` (C# 6+) is the preferred
+        // modern form: it reads like how you'll actually access the dictionary later (dict[1]),
+        // and a duplicate key here just overwrites (last one wins) instead of throwing.
         var lookupTable = new Dictionary<int, string>
+        {
+            [1] = "a",
+            [2] = "b",
+        };
+        Console.WriteLine($"Dictionary (key-value pairs): {string.Join(", ", lookupTable)}");
+
+        // the older `{ key, value }` add-pair form still works — under the hood each pair calls
+        // Add(), so a duplicate key here throws ArgumentException at initialization time instead
+        // of silently overwriting. That can be a feature (catches accidental dupes) or a footgun,
+        // depending on whether you expect your keys to be unique going in.
+        var lookupTable2 = new Dictionary<int, string>
         {
             { 1, "a" },
             { 2, "b" },
         };
-        Console.WriteLine($"Dictionary (key-value pairs): {string.Join(", ", lookupTable)}");
+        Console.WriteLine($"Dictionary via {{ key, value }} add-pairs: {string.Join(", ", lookupTable2)}");
+
+        // Note: there is no dictionary literal via `[ ]` collection expressions (C# 12+) —
+        // `Dictionary<int, string> d = [1: "a"];` is NOT valid syntax in current C#, unlike
+        // arrays/lists. Collection expressions don't (yet) cover key-value pairs.
 
         // Dictionary<K,V> is a hash table — indexer get/set, Add, TryAdd, ContainsKey, TryGetValue, and
         // Remove are all O(1) average case (O(n) worst case on hash collisions, which is rare in practice).
@@ -42,6 +59,10 @@
         // iterate keys / values separately
         Console.WriteLine($"Keys: {string.Join(", ", lookupTable.Keys)}");
         Console.WriteLine($"Values: {string.Join(", ", lookupTable.Values)}");
+        foreach (var key in lookupTable.Keys)
+        {
+            Console.WriteLine($"{key} = {lookupTable[key]}");
+        }
 
         // the classic LeetCode frequency-counter pattern: GetValueOrDefault + indexer assignment
         var charCounts = new Dictionary<char, int>();

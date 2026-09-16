@@ -21,7 +21,7 @@ A personal C# reference/practice repo for LeetCode and interview prep — not a 
 
 - `dotnet build` / `dotnet run --project InterviewPrep` from the repo root.
 - `dotnet format` applies the `.editorconfig` style rules.
-- Roslyn analyzers are enabled (`EnableNETAnalyzers`, `AnalysisLevel=latest`). `CA1051`/`CA1050` (public fields, no namespace — matches LeetCode-provided types like `ListNode`/`TreeNode`) and `CA1304`/`CA1310`/`CA1311` (culture-aware string overloads — `ToUpper()`/`StartsWith(x)` etc. are the plain overloads you'd actually write in an interview) are suppressed in the `.csproj`. Don't "fix" either pattern back to the analyzer-preferred form.
+- Roslyn analyzers are enabled (`EnableNETAnalyzers`, `AnalysisLevel=latest`). `CA1051`/`CA1050` (public fields, no namespace — matches LeetCode-provided types like `ListNode`/`TreeNode`) and `CA1304`/`CA1305`/`CA1310`/`CA1311` (culture-aware string/number-formatting overloads — `ToUpper()`/`StartsWith(x)`/`ToString()` etc. are the plain overloads you'd actually write in an interview) are suppressed in the `.csproj`. Don't "fix" either pattern back to the analyzer-preferred form.
 - `dotnet format --verify-no-changes` (what the pre-commit hook and CI run) fails on *any* analyzer warning it can't auto-fix, not just formatting diffs — so a new warning-causing pattern needs an explicit `NoWarn` entry (with a reason comment) if it's intentional, the same way the two suppressions above were added.
 
 ## Formatting enforcement
