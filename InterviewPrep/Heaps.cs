@@ -6,6 +6,14 @@
         // the element with the LOWEST priority first. Enqueue/Dequeue/Peek are all O(log n);
         // there's no built-in TPriority-only overload for value types like int — you enqueue
         // (element, priority) pairs, and often element == priority for simple cases.
+        //
+        // PriorityQueue does NOT support collection expressions at all — not even `[]` for empty
+        // (the compiler reports CS9174 "type is not constructible"). To pre-populate cleanly
+        // instead of a loop of Enqueue calls, pass a sequence of (element, priority) tuples to
+        // the constructor:
+        var minHeapFromCtor = new PriorityQueue<int, int>([(5, 5), (1, 1), (3, 3), (2, 2)]);
+        Console.WriteLine($"PriorityQueue from tuple-sequence ctor -> Peek() (lowest): {minHeapFromCtor.Peek()}");
+
         var minHeap = new PriorityQueue<int, int>();
         minHeap.Enqueue(5, 5);
         minHeap.Enqueue(1, 1);

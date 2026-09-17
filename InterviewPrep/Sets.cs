@@ -2,9 +2,15 @@
 {
     public static void Run()
     {
-        // create a set — HashSet<T> is a hash table like Dictionary, just without the value
-        var mySet = new HashSet<int> { 1, 2, 3, 4, 5 };
+        // create a set — HashSet<T> is a hash table like Dictionary, just without the value.
+        // Collection expression syntax works fully here (unlike Stack/Queue below) since
+        // HashSet<T> has a real Add method for the compiler to call.
+        HashSet<int> mySet = [1, 2, 3, 4, 5];
         Console.WriteLine($"HashSet: {string.Join(", ", mySet)}");
+
+        // the older `new HashSet<int> { }` form is exactly equivalent
+        var mySet2 = new HashSet<int> { 1, 2, 3, 4, 5 };
+        Console.WriteLine($"HashSet (new HashSet<int> {{ }}): {string.Join(", ", mySet2)}");
         mySet.Add(6); // O(1) average
         Console.WriteLine($"HashSet after Add(6): {string.Join(", ", mySet)}");
 

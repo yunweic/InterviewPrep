@@ -2,9 +2,15 @@
 {
     public static void Run()
     {
-        // create a list of int
-        var numList = new List<int> { 1, 2, 3, 4, 5 };
+        // create a list of int — collection expression syntax (C# 12+) is the modern preferred
+        // form: the type is named once, on the left, instead of twice (`new List<int> { }`).
+        List<int> numList = [1, 2, 3, 4, 5];
         Console.WriteLine($"Number list: {string.Join(", ", numList)}");
+
+        // the older `new List<int> { }` form still works and is exactly equivalent — you'll see
+        // it constantly in existing code, so it's worth recognizing even if you write `[ ]` yourself
+        var numList2 = new List<int> { 1, 2, 3, 4, 5 };
+        Console.WriteLine($"Number list (new List<int> {{ }}): {string.Join(", ", numList2)}");
 
         // add all the number in the list — O(n), Sum() walks the whole sequence once
         var total = numList.Sum();
@@ -15,8 +21,8 @@
         var testTotal = strArray.Sum();
         Console.WriteLine($"Sum of str array: {testTotal}");*/
 
-        // create a list of string
-        var strList = new List<string> { "a", "b", "c", "d", "e" };
+        // create a list of string — collection expression again
+        List<string> strList = ["a", "b", "c", "d", "e"];
         Console.WriteLine($"String list: {string.Join(", ", strList)}");
         Console.WriteLine($"String list joined with no separator: {string.Join("", strList)}");
 
