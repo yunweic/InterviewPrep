@@ -83,6 +83,19 @@ public static class StringsDemo
         var reversed = new string(reversedChars);
         Console.WriteLine($"Reversed: {reversed}");
 
+        // sort a string alphabetically — same pattern: no built-in string.Sort(), go through
+        // char[] + Array.Sort — O(n log n). Sort is ORDINAL by default, so uppercase letters sort
+        // before lowercase ('C' < 'L' < 'd' in ASCII) — a common gotcha if input isn't all one case.
+        char[] sortedChars = word.ToCharArray();
+        Array.Sort(sortedChars);
+        var sortedWord = new string(sortedChars);
+        Console.WriteLine($"Sorted alphabetically (Array.Sort): {sortedWord}");
+
+        // LINQ one-liner alternative — same ordinal ordering, just more concise. Handy for the
+        // classic "are these two strings anagrams?" check: sort both, compare for equality.
+        var sortedWord2 = new string(word.OrderBy(c => c).ToArray());
+        Console.WriteLine($"Sorted alphabetically (OrderBy): {sortedWord2}");
+
         // StringBuilder — use instead of += in a loop to avoid O(n^2) string reallocation.
         // Append is O(1) amortized per call, so building a string of length n this way is O(n) total —
         // compare to `result += c` in a loop, which reallocates and copies the whole string every
@@ -91,6 +104,40 @@ public static class StringsDemo
         foreach (var c in word)
             sb.Append(c).Append('-');
         Console.WriteLine($"StringBuilder Append in a loop: {sb.ToString().TrimEnd('-')}");
+
+        // StringBuilder is a REAL mutable buffer, unlike string — Length can be read AND set
+        // (shortening it truncates in place, no reallocation), and the indexer reads/writes
+        // individual characters directly.
+        Console.WriteLine($"StringBuilder.Length: {sb.Length}");
+        sb.Length--; // trims the trailing '-' by shrinking the buffer in place
+        Console.WriteLine($"After Length-- (trims trailing '-'): {sb}");
+        sb[0] = 'l';
+        Console.WriteLine($"After sb[0] = 'l': {sb}");
+
+        // Insert / Remove / Replace all mutate in place and return the StringBuilder, so they chain
+        var sb2 = new StringBuilder("LeetCode");
+        sb2.Insert(4, "-"); // Insert(index, value)
+        Console.WriteLine($"Insert(4, \"-\"): {sb2}");
+        sb2.Remove(4, 1); // Remove(startIndex, length)
+        Console.WriteLine($"Remove(4, 1): {sb2}");
+        sb2.Replace("Code", "Sharp"); // find-and-replace, like string.Replace but in place
+        Console.WriteLine($"Replace(\"Code\", \"Sharp\"): {sb2}");
+
+        // gotcha: there's no built-in Reverse() on StringBuilder (unlike List<T>.Reverse()) —
+        // go through ToCharArray() + Array.Reverse, same as reversing a plain string
+        var sb3 = new StringBuilder("LeetCode");
+        var sb3Chars = sb3.ToString().ToCharArray();
+        Array.Reverse(sb3Chars);
+        Console.WriteLine($"StringBuilder reversed (no built-in Reverse()): {new string(sb3Chars)}");
+
+        // ToString(startIndex, length) pulls out a substring without building an intermediate
+        // full string first
+        Console.WriteLine($"sb3.ToString(0, 4): {sb3.ToString(0, 4)}");
+
+        // if you know the final size upfront, pre-sizing the capacity avoids internal
+        // reallocations as it grows — new StringBuilder(capacity), not a length
+        var sbPresized = new StringBuilder(capacity: 64);
+        Console.WriteLine($"Pre-sized StringBuilder capacity: {sbPresized.Capacity}");
 
         // string comparison — == does value comparison in C# (unlike Java's reference-comparison gotcha) — O(n)
         Console.WriteLine($"\"abc\" == \"abc\": {"abc" == "abc"}");
