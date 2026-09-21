@@ -39,6 +39,26 @@ public static class StringsDemo
         Console.WriteLine($"char.IsDigit('7'): {char.IsDigit('7')}, char.IsLetter('7'): {char.IsLetter('7')}");
         Console.WriteLine($"char.IsUpper('L'): {char.IsUpper('L')}, char.IsWhiteSpace(' '): {char.IsWhiteSpace(' ')}");
 
+        // IsLetterOrDigit — the classic building block for "Valid Palindrome"-style problems:
+        // filter a string down to only alphanumeric characters before comparing
+        Console.WriteLine($"char.IsLetterOrDigit('a'): {char.IsLetterOrDigit('a')}, char.IsLetterOrDigit('!'): {char.IsLetterOrDigit('!')}");
+
+        // string <-> int conversion
+        var parsedInt = int.Parse("42"); // throws FormatException if the string isn't a valid int
+        Console.WriteLine($"int.Parse(\"42\"): {parsedInt}");
+
+        bool parsedOk = int.TryParse("abc", out int triedInt); // safe version — no exception, returns bool
+        Console.WriteLine($"int.TryParse(\"abc\", out ...): success={parsedOk}, value={triedInt}");
+
+        Console.WriteLine($"42.ToString(): {42.ToString()}");
+
+        // converting a single DIGIT CHARACTER to its numeric value — char is a numeric type under
+        // the hood, so subtracting '0' is much cheaper than int.Parse(c.ToString()). A staple in
+        // digit-DP / string-to-number / sum-of-digits style problems.
+        var digitChar = '7';
+        var digitValue = digitChar - '0';
+        Console.WriteLine($"'{digitChar}' - '0': {digitValue}");
+
         // traversal — indexer gives read-only char access (can't do word[0] = 'x', string is immutable) — O(1)
         Console.WriteLine($"Indexer word[0]: {word[0]}");
 
