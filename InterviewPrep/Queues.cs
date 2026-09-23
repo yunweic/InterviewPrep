@@ -35,5 +35,16 @@
         Queue<int> emptyQueue = [];
         emptyQueue.Enqueue(1);
         Console.WriteLine($"Queue.Peek() after Enqueue(1) on an empty-collection-expression queue: {emptyQueue.Peek()}");
+
+        // Count (not Length) — Queue<T> implements ICollection<T>, so Count is an O(1) field read
+        // (see ListsDemo for the full Count-property vs LINQ-Count()-extension explanation).
+        Console.WriteLine($"emptyQueue.Count: {emptyQueue.Count}");
+
+        // quick copy — O(n): constructor-from-sequence. Queue<T>'s enumerator yields items
+        // front-to-back (the same order Dequeue would remove them), and the constructor enqueues in
+        // enumeration order, so the copy's front-to-back order matches the original exactly.
+        var copySource = new Queue<int>([1, 2, 3]);
+        var queueCopy = new Queue<int>(copySource);
+        Console.WriteLine($"Queue copy preserves dequeue order — original: {string.Join(", ", copySource)}, copy: {string.Join(", ", queueCopy)}");
     }
 }

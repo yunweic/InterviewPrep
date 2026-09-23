@@ -16,6 +16,7 @@ RunSection(nameof(SortingDemo), SortingDemo.Run);
 RunSection(nameof(HeapsDemo), HeapsDemo.Run);
 RunSection(nameof(ConditionalsDemo), ConditionalsDemo.Run);
 RunSection(nameof(TuplesDemo), TuplesDemo.Run);
+RunSection(nameof(MathDemo), MathDemo.Run);
 
 // prints a header before each topic so console output doesn't blur into one wall of text
 void RunSection(string name, Action run)

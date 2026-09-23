@@ -8,6 +8,12 @@
         rectGrid[1, 2] = 9;
         Console.WriteLine($"Rectangular grid[1,2]: {rectGrid[1, 2]}, GetLength(0)={rectGrid.GetLength(0)}, GetLength(1)={rectGrid.GetLength(1)}");
 
+        // quick copy — a RECTANGULAR array is one single block of memory (not an array of arrays),
+        // so unlike the jagged case below, Clone() here IS a complete, fully-independent copy — O(n*m).
+        var rectClone = (int[,])rectGrid.Clone();
+        rectClone[0, 0] = -1;
+        Console.WriteLine($"Mutating rectClone[0,0] leaves rectGrid[0,0] untouched: rectGrid[0,0]={rectGrid[0, 0]}, rectClone[0,0]={rectClone[0, 0]}");
+
         // jagged array — an array of arrays, rows can have different lengths. This is what
         // most LeetCode problems actually hand you (int[][] grid), and what you'll build yourself
         // most often since each row is independently allocated.
@@ -16,6 +22,18 @@
             jaggedGrid[i] = new int[i + 1]; // row 0 has 1 column, row 1 has 2, row 2 has 3
         jaggedGrid[2][2] = 5;
         Console.WriteLine($"Jagged grid[2][2]: {jaggedGrid[2][2]}, row lengths: {string.Join(", ", jaggedGrid.Select(row => row.Length))}");
+
+        // quick copy gotcha: Clone() on a jagged array only copies the OUTER array — the row arrays
+        // themselves are still shared by reference between original and clone, so mutating a cell
+        // through either one affects both.
+        var jaggedShallowClone = (int[][])jaggedGrid.Clone();
+        jaggedShallowClone[0][0] = -1;
+        Console.WriteLine($"Mutating jaggedShallowClone[0][0] also changed jaggedGrid[0][0]: {jaggedGrid[0][0]}");
+
+        // a true independent copy needs to clone each row too — O(n*m), n = row count, m = avg row length
+        var jaggedDeepClone = jaggedGrid.Select(row => (int[])row.Clone()).ToArray();
+        jaggedDeepClone[2][2] = -1;
+        Console.WriteLine($"Mutating jaggedDeepClone[2][2] leaves jaggedGrid[2][2] untouched: jaggedGrid[2][2]={jaggedGrid[2][2]}, clone[2][2]={jaggedDeepClone[2][2]}");
 
         // jagged array literal, the form you'll write constantly for test input
         int[][] matrix =

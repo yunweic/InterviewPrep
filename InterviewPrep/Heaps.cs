@@ -66,5 +66,20 @@
                 kthLargestHeap.Dequeue(); // evict the current smallest
         }
         Console.WriteLine($"2nd largest of [4,5,8,2] via size-limited min-heap: {kthLargestHeap.Peek()}");
+
+        // Count (property) is the ONLY way to get PriorityQueue's size — unlike List/HashSet/
+        // Dictionary/Queue/Stack, PriorityQueue<TElement, TPriority> does not implement IEnumerable<T>
+        // itself (only its UnorderedItems property does), so the LINQ Count() extension method can't
+        // even be called on it directly — there's no dynamic fast-path-vs-enumerate question here at all.
+        Console.WriteLine($"kthLargestHeap.Count: {kthLargestHeap.Count}");
+
+        // quick copy — no copy constructor from another PriorityQueue directly, but UnorderedItems
+        // (the heap's raw internal array order, not sorted) can be fed right back into the
+        // (element, priority)-tuple-sequence constructor — O(n) to enumerate + O(n) to heapify.
+        // The copy's Dequeue order comes out identical to the original even though UnorderedItems'
+        // physical layout differs, because a heap's Dequeue order is fully determined by the
+        // (element, priority) multiset and comparer, not by insertion order.
+        var heapCopy = new PriorityQueue<int, int>(kthLargestHeap.UnorderedItems);
+        Console.WriteLine($"heapCopy.Peek() matches kthLargestHeap.Peek(): {heapCopy.Peek()} == {kthLargestHeap.Peek()}");
     }
 }

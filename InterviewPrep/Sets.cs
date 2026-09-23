@@ -21,5 +21,15 @@
 
         mySet.Remove(6); // O(1) average
         Console.WriteLine($"HashSet after Remove(6): {string.Join(", ", mySet)}");
+
+        // Count (not Length) — HashSet<T> implements ICollection<T>, so Count is an O(1) field read
+        // (see ListsDemo for the full Count-property vs LINQ-Count()-extension explanation).
+        Console.WriteLine($"mySet.Count: {mySet.Count}");
+
+        // quick copy — O(n): constructor-from-sequence, LINQ ToHashSet(), or spread
+        var setCopyCtor = new HashSet<int>(mySet);
+        var setToHashSet = mySet.ToHashSet();
+        HashSet<int> setSpread = [.. mySet];
+        Console.WriteLine($"Copies — ctor: {string.Join(", ", setCopyCtor)}, ToHashSet(): {string.Join(", ", setToHashSet)}, [..spread]: {string.Join(", ", setSpread)}");
     }
 }

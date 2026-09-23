@@ -69,5 +69,16 @@
         foreach (var c in "banana")
             charCounts[c] = charCounts.GetValueOrDefault(c, 0) + 1;
         Console.WriteLine($"Frequency map of \"banana\": {string.Join(", ", charCounts)}");
+
+        // Count (not Length) — Dictionary<K,V> implements ICollection<KeyValuePair<K,V>>, so Count is
+        // an O(1) field read, same as List<T>.Count. LINQ's Count() extension also takes the O(1)
+        // fast path here for the same reason (see ListsDemo for when Count() has to enumerate instead).
+        Console.WriteLine($"lookupTable.Count: {lookupTable.Count}");
+
+        // quick copy — O(n): constructor-from-dictionary, or LINQ ToDictionary. Both are SHALLOW —
+        // keys/values are copied as-is, so reference-typed values are still shared with the original.
+        var dictCopyCtor = new Dictionary<int, string>(lookupTable);
+        var dictToDictionary = lookupTable.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        Console.WriteLine($"Copies — ctor: {string.Join(", ", dictCopyCtor)}, ToDictionary(): {string.Join(", ", dictToDictionary)}");
     }
 }

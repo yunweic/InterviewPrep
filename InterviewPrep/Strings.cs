@@ -162,5 +162,22 @@ public static class StringsDemo
         // string comparison — == does value comparison in C# (unlike Java's reference-comparison gotcha) — O(n)
         Console.WriteLine($"\"abc\" == \"abc\": {"abc" == "abc"}");
         Console.WriteLine($"string.Equals(\"abc\", \"ABC\", StringComparison.OrdinalIgnoreCase): {string.Equals("abc", "ABC", StringComparison.OrdinalIgnoreCase)}");
+
+        // Length (not Count) — string.Length is an O(1) field read, same idea as an array's Length.
+        // But LINQ's Count() extension method is evaluated DYNAMICALLY (see ListsDemo for the general
+        // rule): it only gets the O(1) fast path when the source implements ICollection<T>, and string
+        // does NOT implement ICollection<char> (only IEnumerable<char>) — so word.Count() has no fast
+        // path and walks every character, O(n), even though word.Length answers the same question in O(1).
+        Console.WriteLine($"word.Length: {word.Length}");
+        Console.WriteLine($"word.Count() (LINQ extension, string has no ICollection<char> -> must enumerate, O(n)): {word.Count()}");
+
+        // quick copy — strings are immutable, so plain assignment is always a safe, O(1) "copy": both
+        // variables reference the SAME object, but since neither can be mutated, there's no way for a
+        // change through one to affect the other. Forcing a genuinely different object with the same
+        // content (rarely needed — mainly identity/interning edge cases) costs O(n) instead.
+        var wordAssigned = word;
+        var wordForcedNewObject = new string(word.ToCharArray());
+        Console.WriteLine($"ReferenceEquals(word, wordAssigned): {ReferenceEquals(word, wordAssigned)} (same object, O(1) copy)");
+        Console.WriteLine($"ReferenceEquals(word, wordForcedNewObject): {ReferenceEquals(word, wordForcedNewObject)} (different object, same value, O(n) copy)");
     }
 }

@@ -21,6 +21,25 @@ public static class LinkedListsDemo
         }
         Console.WriteLine($"Traversal: {string.Join(" -> ", values)}");
 
+        // Length/Count: this hand-rolled ListNode has neither — nothing here maintains a running
+        // count as nodes are added/removed, so "how long is this list?" requires a full O(n)
+        // traversal (like the one above). Contrast with the BCL's System.Collections.Generic.LinkedList<T>,
+        // which DOES implement ICollection<T> and maintains Count as a field — O(1), same as List<T>.Count.
+        var length = 0;
+        for (var node = head; node != null; node = node.Next)
+            length++;
+        Console.WriteLine($"Length via full traversal (no Count field exists): {length}");
+
+        // quick copy — no built-in copy for this hand-rolled ListNode; build a new chain node-by-node
+        // while walking the original — O(n). This is the core of the classic "Copy List with Random
+        // Pointer" problem, minus the random-pointer complication.
+        var copiedHead = CopyList(head);
+        copiedHead!.Value = 999; // mutate the copy
+        var copiedValues = new List<int>();
+        for (var node = copiedHead; node != null; node = node.Next)
+            copiedValues.Add(node.Value);
+        Console.WriteLine($"Copied list (independent nodes): {string.Join(" -> ", copiedValues)}, original head unaffected: {head.Value}");
+
         // reverse a linked list in place — O(n) time, O(1) space.
         // Classic three-pointer walk: keep the previous node, snapshot next before overwriting Next.
         ListNode? prev = null;
@@ -53,6 +72,21 @@ public static class LinkedListsDemo
         c.Next = a; // creates the cycle
         var cycleResult = HasCycle(a);
         Console.WriteLine($"HasCycle on a cyclic list: {cycleResult}");
+    }
+
+    private static ListNode? CopyList(ListNode? src)
+    {
+        if (src == null) return null;
+        var newHead = new ListNode(src.Value, null);
+        var srcCursor = src.Next;
+        var newCursor = newHead;
+        while (srcCursor != null)
+        {
+            newCursor.Next = new ListNode(srcCursor.Value, null);
+            newCursor = newCursor.Next;
+            srcCursor = srcCursor.Next;
+        }
+        return newHead;
     }
 
     private static bool HasCycle(ListNode? head)

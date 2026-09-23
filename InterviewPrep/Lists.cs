@@ -45,5 +45,33 @@
         // but O(1) here specifically because we're removing the last element (nothing to shift)
         strList.RemoveAt(strList.Count - 1);
         Console.WriteLine($"String list after RemoveAt(last index): {string.Join(", ", strList)}");
+
+        // Length vs Count: List<T> (and Dictionary/HashSet/Queue/Stack) expose a Count PROPERTY, not
+        // Length — arrays/strings use Length instead. Both are O(1): List<T> maintains Count as a field
+        // that Add/Remove keep up to date, same idea as an array's Length field.
+        Console.WriteLine($"strList.Count (property): {strList.Count}");
+
+        // LINQ's Count() EXTENSION METHOD (Enumerable.Count()) is a different thing from the Count
+        // property above, and it's evaluated DYNAMICALLY: at runtime it checks whether the source
+        // implements ICollection<T> (List<T>/HashSet<T>/Dictionary<K,V>/etc. all do) and, if so, just
+        // returns that type's O(1) Count property directly — no enumeration needed.
+        Console.WriteLine($"strList.Count() (LINQ extension, but strList IS ICollection<T> so it takes the O(1) fast path): {strList.Count()}");
+
+        // A lazy LINQ query like Where(...) returns a plain IEnumerable<T> with no ICollection<T>
+        // behind it (nothing has counted anything yet), so Count() on THAT has no fast path available
+        // and has to walk every element to count them — O(n), same cost as if you'd written the loop yourself.
+        IEnumerable<int> lazyQuery = numList.Where(n => n > 1);
+        Console.WriteLine($"lazyQuery.Count() (LINQ extension, no ICollection<T> backing -> must enumerate, O(n)): {lazyQuery.Count()}");
+
+        // quick copy — three equivalent one-liners, all O(n):
+        var listCopyCtor = new List<int>(numList); // constructor-from-sequence
+        var listToList = numList.ToList(); // LINQ
+        List<int> listSpread = [.. numList]; // collection-expression spread (C# 12+)
+        Console.WriteLine($"Copies — ctor: {string.Join(", ", listCopyCtor)}, ToList(): {string.Join(", ", listToList)}, [..spread]: {string.Join(", ", listSpread)}");
+
+        // all three are SHALLOW copies, same reference-vs-value-element caveat as arrays — mutating
+        // the copy's own list structure (Add/Remove) never touches the original, though.
+        listCopyCtor.Add(999);
+        Console.WriteLine($"Mutating listCopyCtor doesn't affect numList: numList={string.Join(", ", numList)}, listCopyCtor={string.Join(", ", listCopyCtor)}");
     }
 }

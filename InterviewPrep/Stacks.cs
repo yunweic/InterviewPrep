@@ -36,5 +36,20 @@
         Stack<int> emptyStack = [];
         emptyStack.Push(1);
         Console.WriteLine($"Stack.Peek() after Push(1) on an empty-collection-expression stack: {emptyStack.Peek()}");
+
+        // Count (not Length) — Stack<T> implements ICollection<T>, so Count is an O(1) field read
+        // (see ListsDemo for the full Count-property vs LINQ-Count()-extension explanation).
+        Console.WriteLine($"emptyStack.Count: {emptyStack.Count}");
+
+        // quick copy — GOTCHA: new Stack<T>(collection) pushes items in ENUMERATION order, and
+        // Stack<T>'s enumerator yields items TOP-to-bottom (the same order Pop would remove them) —
+        // so naively copying via the constructor actually REVERSES the pop order versus the original.
+        var copySource = new Stack<int>([1, 2, 3]); // pushes 1,2,3 in order -> top is 3
+        var reversedCopy = new Stack<int>(copySource); // enumerates 3,2,1, pushes in that order -> top is 1
+        Console.WriteLine($"copySource pop order: {string.Join(", ", copySource)}, reversedCopy pop order (REVERSED!): {string.Join(", ", reversedCopy)}");
+
+        // to copy a Stack while preserving its pop order, reverse the enumeration first (O(n) either way)
+        var orderPreservingCopy = new Stack<int>(copySource.Reverse());
+        Console.WriteLine($"orderPreservingCopy pop order (matches copySource): {string.Join(", ", orderPreservingCopy)}");
     }
 }

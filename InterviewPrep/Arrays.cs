@@ -31,5 +31,23 @@
         // reference types) — common when you need a DP array/output buffer of a known size upfront
         var zeroedArray = new int[2];
         Console.WriteLine($"new int[2] (default-initialized): {string.Join(", ", zeroedArray)}");
+
+        // Length vs Count: arrays expose Length only (no Count) — it's a field baked into the array
+        // at creation time, so reading it is O(1) and there's nothing to dynamically recompute (arrays
+        // are fixed-size). Resizable BCL collections (List<T>, Dictionary<K,V>, HashSet<T>, etc.) expose
+        // Count instead — see ListsDemo for how Count differs from LINQ's Count() extension method.
+        Console.WriteLine($"numArray.Length: {numArray.Length}");
+
+        // quick copy — three equivalent one-liners, all O(n) (each copies every element into new storage):
+        var arrayClone = (int[])numArray.Clone(); // Clone() returns object, so it needs a cast
+        var arrayToArray = numArray.ToArray(); // LINQ — no cast needed
+        int[] arraySpread = [.. numArray]; // collection-expression spread (C# 12+)
+        Console.WriteLine($"Copies — Clone(): {string.Join(", ", arrayClone)}, ToArray(): {string.Join(", ", arrayToArray)}, [..spread]: {string.Join(", ", arraySpread)}");
+
+        // gotcha: all three are SHALLOW copies — fine here since int is a value type, but for an
+        // array of reference-type elements the copy would hold the SAME object references as the
+        // original, so mutating a shared element through either array affects both.
+        arrayClone[0] = 999;
+        Console.WriteLine($"Mutating arrayClone[0] leaves numArray untouched: numArray[0]={numArray[0]}, arrayClone[0]={arrayClone[0]}");
     }
 }
