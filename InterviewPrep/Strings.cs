@@ -59,6 +59,26 @@ public static class StringsDemo
         var digitValue = digitChar - '0';
         Console.WriteLine($"'{digitChar}' - '0': {digitValue}");
 
+        // Convert — the main reason to reach for it on LeetCode is BASE conversion, which
+        // int.Parse / ToString() can't do. Only bases 2, 8, 10, 16 are supported. O(number of digits).
+        Console.WriteLine($"Convert.ToString(11, 2) (int -> binary string): {Convert.ToString(11, 2)}");
+        Console.WriteLine($"Convert.ToInt32(\"1011\", 2) (binary string -> int): {Convert.ToInt32("1011", 2)}");
+        Console.WriteLine($"Convert.ToString(255, 16) (int -> hex string): {Convert.ToString(255, 16)}");
+
+        // gotcha: negative numbers come out as their 32-bit two's complement, not "-101"
+        Console.WriteLine($"Convert.ToString(-5, 2): {Convert.ToString(-5, 2)}");
+
+        // binary string without leading-zero trimming — PadLeft to a fixed width (e.g. bit-manipulation problems)
+        Console.WriteLine($"Convert.ToString(5, 2).PadLeft(8, '0'): {Convert.ToString(5, 2).PadLeft(8, '0')}");
+
+        // Convert.ToInt32(string) vs int.Parse: Convert treats null as 0 instead of throwing
+        string? nullString = null;
+        Console.WriteLine($"Convert.ToInt32(null string): {Convert.ToInt32(nullString)} (int.Parse(null) would throw ArgumentNullException)");
+
+        // Convert.ToInt32(double) ROUNDS (banker's rounding, same as Math.Round), while an (int) cast TRUNCATES toward zero
+        Console.WriteLine($"Convert.ToInt32(2.7): {Convert.ToInt32(2.7)}, (int)2.7: {(int)2.7}");
+        Console.WriteLine($"Convert.ToInt32(2.5): {Convert.ToInt32(2.5)} (rounds to even), (int)2.5: {(int)2.5}");
+
         // traversal — indexer gives read-only char access (can't do word[0] = 'x', string is immutable) — O(1)
         Console.WriteLine($"Indexer word[0]: {word[0]}");
 

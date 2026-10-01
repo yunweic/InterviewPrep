@@ -18,9 +18,30 @@
         // This is the single biggest "make it fast enough" move on LeetCode: swap a List you're
         // only calling Contains() on for a HashSet, and an O(n^2) scan becomes O(n).
         Console.WriteLine($"mySet.Contains(3): {mySet.Contains(3)}");
+        Console.WriteLine($"mySet.Contains(99): {mySet.Contains(99)}");
+
+        // Add returns bool — false if the element was already present (set is unchanged).
+        // Duplicate check + insert in one O(1) call, no separate Contains needed
+        // (e.g. "Contains Duplicate": `if (!seen.Add(x)) return true;`).
+        bool addedNew = mySet.Add(7);
+        bool addedDup = mySet.Add(7);
+        Console.WriteLine($"mySet.Add(7) first time: {addedNew}, second time: {addedDup}");
 
         mySet.Remove(6); // O(1) average
         Console.WriteLine($"HashSet after Remove(6): {string.Join(", ", mySet)}");
+
+        // Remove also returns bool — false if the element wasn't there (no exception thrown)
+        bool removedMissing = mySet.Remove(99);
+        Console.WriteLine($"mySet.Remove(99) (not present): {removedMissing}");
+
+        // TryGetValue — O(1) average; returns the instance actually stored in the set.
+        // Only interesting with a custom comparer, where "equal" values can still differ
+        // (here: case-insensitive set, looking up "APPLE" gives back the stored "apple").
+        var words = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "apple", "banana" };
+        if (words.TryGetValue("APPLE", out string? stored))
+        {
+            Console.WriteLine($"words.TryGetValue(\"APPLE\"): found stored value \"{stored}\"");
+        }
 
         // Count (not Length) — HashSet<T> implements ICollection<T>, so Count is an O(1) field read
         // (see ListsDemo for the full Count-property vs LINQ-Count()-extension explanation).
