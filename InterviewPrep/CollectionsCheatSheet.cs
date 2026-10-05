@@ -36,6 +36,8 @@ public static class CollectionsCheatSheetDemo
         //                     Insert(i, s) O(n)          Length-- O(1) (drop last)  ToString() O(n)
         //   List<T>           Add O(1) amortized         Remove(value) O(n)         list[i] O(1)                     —        Count
         //                     Insert(i, x) O(n)          RemoveAt(i) O(n - i)       Contains O(n)  <- the slow one
+        //   LinkedList<T>     AddFirst / AddLast O(1)    Remove(node) O(1)          no indexer — walk O(n)           —        Count
+        //                     AddAfter(node, x) O(1)     Remove(value) O(n)         Find / Contains O(n)
         //   HashSet<T>        Add O(1) amortized         Remove O(1)                Contains O(1)                    —        Count
         //   Dictionary<K,V>   Add / d[k] = v O(1) am.    Remove O(1)                ContainsKey / TryGetValue O(1)   —        Count
         //                                                                           ContainsValue O(n)
