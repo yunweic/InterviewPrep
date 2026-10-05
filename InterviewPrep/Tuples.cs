@@ -42,6 +42,31 @@
         foreach (var (id, name) in people)
             Console.WriteLine($"Person {id}: {name}");
 
+        // declaring a Queue of tuples (BFS on a grid, e.g. Rotting Oranges) — the type has to be
+        // written once, either on the right with `var` or on the left with target-typed `new()`.
+        // `var q = new();` won't compile: there's nothing to infer the type from.
+        var bfsQueueVar = new Queue<(int i, int j)>();
+        Queue<(int i, int j)> bfsQueueTargetTyped = new(); // also the only option for fields/properties
+        bfsQueueVar.Enqueue((0, 1));
+        bfsQueueTargetTyped.Enqueue((2, 3));
+        Console.WriteLine($"Queue via var: [{string.Join(", ", bfsQueueVar)}], via target-typed new(): [{string.Join(", ", bfsQueueTargetTyped)}]");
+
+        // unpacking after Dequeue — O(1). Element names survive, so either access by name or
+        // deconstruct straight into locals (the usual BFS-loop shape).
+        var cell = bfsQueueVar.Dequeue();
+        Console.WriteLine($"Dequeue() then access by name: cell.i={cell.i}, cell.j={cell.j}");
+
+        var (row, col) = bfsQueueTargetTyped.Dequeue();
+        Console.WriteLine($"Dequeue() deconstructed into (row, col): row={row}, col={col}");
+
+        // TryDequeue — you can't deconstruct inside `out (...)`, so take `out var` then unpack it
+        bfsQueueVar.Enqueue((4, 5));
+        while (bfsQueueVar.TryDequeue(out var next))
+        {
+            var (ni, nj) = next;
+            Console.WriteLine($"TryDequeue(out var next) deconstructed: ni={ni}, nj={nj}");
+        }
+
         // this ValueTuple `(T1, T2)` syntax (C# 7+) is a STRUCT (value type) and is what you
         // should default to. The older System.Tuple<T1, T2> (via Tuple.Create(...)) is a class
         // (reference type), has no named elements, and no built-in value equality on == — it's

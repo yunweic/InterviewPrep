@@ -49,5 +49,18 @@
         // original, so mutating a shared element through either array affects both.
         arrayClone[0] = 999;
         Console.WriteLine($"Mutating arrayClone[0] leaves numArray untouched: numArray[0]={numArray[0]}, arrayClone[0]={arrayClone[0]}");
+
+        // reverse IN PLACE — O(n). Arrays have no instance Reverse(), so use the static Array.Reverse.
+        int[] reverseArray = [1, 2, 3, 4, 5];
+        Array.Reverse(reverseArray);
+        Console.WriteLine($"Array after Array.Reverse(arr) (in place): {string.Join(", ", reverseArray)}");
+
+        // gotcha: arr.Reverse() compiles, but since arrays have no instance Reverse() it binds to
+        // LINQ's Enumerable.Reverse, which returns a NEW sequence and leaves the array untouched.
+        // Discard the result and nothing happens — silently. (List<T> is the opposite: there,
+        // list.Reverse() IS the in-place instance method — see ListsDemo.)
+        int[] linqReverseArray = [1, 2, 3, 4, 5];
+        var reversedArrayCopy = linqReverseArray.Reverse().ToArray(); // O(n) copy
+        Console.WriteLine($"arr.Reverse().ToArray() (LINQ copy): {string.Join(", ", reversedArrayCopy)}, original unchanged: {string.Join(", ", linqReverseArray)}");
     }
 }

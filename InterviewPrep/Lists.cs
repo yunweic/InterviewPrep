@@ -73,5 +73,20 @@
         // the copy's own list structure (Add/Remove) never touches the original, though.
         listCopyCtor.Add(999);
         Console.WriteLine($"Mutating listCopyCtor doesn't affect numList: numList={string.Join(", ", numList)}, listCopyCtor={string.Join(", ", listCopyCtor)}");
+
+        // reverse IN PLACE — O(n). List<T> has its own instance Reverse() (returns void), unlike
+        // arrays which need the static Array.Reverse(arr) — see ArraysDemo for that side's gotcha.
+        var reverseList = new List<int> { 1, 2, 3, 4, 5 };
+        reverseList.Reverse();
+        Console.WriteLine($"List after Reverse() (in place): {string.Join(", ", reverseList)}");
+
+        // Reverse(index, count) overload — reverse just a sub-range, O(count)
+        reverseList.Reverse(0, 2);
+        Console.WriteLine($"List after Reverse(0, 2) (only indices 0..1 flipped): {string.Join(", ", reverseList)}");
+
+        // gotcha: list.Reverse() ALWAYS binds to the in-place instance method, so it can't be used to
+        // get a reversed COPY. Call LINQ's Enumerable.Reverse explicitly for that — O(n), original untouched.
+        var reversedCopy = Enumerable.Reverse(reverseList).ToList();
+        Console.WriteLine($"Enumerable.Reverse(list).ToList() copy: {string.Join(", ", reversedCopy)}, original unchanged: {string.Join(", ", reverseList)}");
     }
 }

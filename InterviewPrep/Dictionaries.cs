@@ -64,6 +64,14 @@
             Console.WriteLine($"{key} = {lookupTable[key]}");
         }
 
+        // iterate with tuple-style deconstruction — KeyValuePair<K,V> has a Deconstruct method, so
+        // `var (key, value)` unpacks each entry directly. Avoids the extra O(1) hash lookup per key
+        // that `lookupTable[key]` does above, and reads cleaner than kvp.Key / kvp.Value.
+        foreach (var (key, value) in lookupTable)
+        {
+            Console.WriteLine($"Deconstructed (key, value): {key} = {value}");
+        }
+
         // the classic LeetCode frequency-counter pattern: GetValueOrDefault + indexer assignment
         var charCounts = new Dictionary<char, int>();
         foreach (var c in "banana")
