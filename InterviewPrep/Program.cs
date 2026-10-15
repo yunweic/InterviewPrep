@@ -20,7 +20,10 @@ RunSection(nameof(CollectionsCheatSheetDemo), CollectionsCheatSheetDemo.Run);
 RunSection(nameof(ConditionalsDemo), ConditionalsDemo.Run);
 RunSection(nameof(TuplesDemo), TuplesDemo.Run);
 RunSection(nameof(MathDemo), MathDemo.Run);
+RunSection(nameof(RandomDemo), RandomDemo.Run);
 RunSection(nameof(OOPDemo), OOPDemo.Run);
+RunSection(nameof(ExceptionsDemo), ExceptionsDemo.Run);
+RunSection(nameof(LocksDemo), LocksDemo.Run);
 
 // prints a header before each topic so console output doesn't blur into one wall of text
 void RunSection(string name, Action run)
