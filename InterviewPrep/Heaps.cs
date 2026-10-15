@@ -81,5 +81,27 @@
         // (element, priority) multiset and comparer, not by insertion order.
         var heapCopy = new PriorityQueue<int, int>(kthLargestHeap.UnorderedItems);
         Console.WriteLine($"heapCopy.Peek() matches kthLargestHeap.Peek(): {heapCopy.Peek()} == {kthLargestHeap.Peek()}");
+
+        // iterating — `foreach (var x in pq)` does NOT compile, because PriorityQueue isn't IEnumerable.
+        // Three options, depending on whether you need priority order and whether you can destroy the heap:
+        var iterHeap = new PriorityQueue<string, int>([("c", 3), ("a", 1), ("d", 4), ("b", 2)]);
+
+        // 1) UnorderedItems: O(n), READ-ONLY, but in the heap's internal array order, NOT priority
+        //    order (only the first item is guaranteed to be the min). Each item is an
+        //    (Element, Priority) tuple, so it deconstructs directly in the foreach.
+        foreach (var (element, priority) in iterHeap.UnorderedItems)
+        {
+            Console.WriteLine($"UnorderedItems (heap array order, NOT sorted): {element} (priority {priority})");
+        }
+
+        // 2) Dequeue loop: priority order, but DESTRUCTIVE, O(n log n). TryDequeue also returns the priority.
+        // 3) need priority order AND to keep the heap: drain a COPY made from UnorderedItems (O(n) copy + O(n log n) drain)
+        var drainCopy = new PriorityQueue<string, int>(iterHeap.UnorderedItems);
+        var sortedOrder = new List<string>();
+        while (drainCopy.TryDequeue(out string? element, out int priority))
+        {
+            sortedOrder.Add($"{element}:{priority}");
+        }
+        Console.WriteLine($"Drain a copy via TryDequeue (priority order): {string.Join(", ", sortedOrder)}, original iterHeap.Count still: {iterHeap.Count}");
     }
 }

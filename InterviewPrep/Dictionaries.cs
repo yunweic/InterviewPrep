@@ -78,6 +78,44 @@
             charCounts[c] = charCounts.GetValueOrDefault(c, 0) + 1;
         Console.WriteLine($"Frequency map of \"banana\": {string.Join(", ", charCounts)}");
 
+        // the counter pattern works because default(int) is 0. For a COLLECTION value, default(T) is
+        // null — NOT an empty collection. Dictionary never auto-creates a value for a missing key
+        // (unlike Python's defaultdict); you have to construct the collection AND store it yourself.
+        var groupsByLength = new Dictionary<int, List<string>>();
+        Console.WriteLine($"Dictionary<int, List<string>>.GetValueOrDefault(3) on missing key: {groupsByLength.GetValueOrDefault(3)?.ToString() ?? "null"} (not an empty list)");
+
+        // `GetValueOrDefault(k) ?? []` gives you an empty list but does NOT put it in the dictionary —
+        // anything you Add to it is lost.
+        var detachedList = groupsByLength.GetValueOrDefault(3) ?? [];
+        detachedList.Add("lost");
+        Console.WriteLine($"After (GetValueOrDefault(3) ?? []).Add(\"lost\"): ContainsKey(3) = {groupsByLength.ContainsKey(3)}");
+
+        // group-by pattern 1: TryGetValue, then create + store on a miss. On a hit, `list` is a reference
+        // to the SAME List object the dictionary holds, so list.Add updates the stored value.
+        // Two hash lookups on a miss (TryGetValue + indexer set), one on a hit — O(1) average either way.
+        foreach (var word in new[] { "eat", "tea", "tan", "at", "bat" })
+        {
+            if (!groupsByLength.TryGetValue(word.Length, out var list))
+            {
+                list = [];
+                groupsByLength[word.Length] = list;
+            }
+            list.Add(word);
+        }
+        Console.WriteLine($"Group by length via TryGetValue + create/store: {string.Join(" | ", groupsByLength.Select(kvp => $"{kvp.Key}: [{string.Join(", ", kvp.Value)}]"))}");
+
+        // group-by pattern 2: CollectionsMarshal.GetValueRefOrAddDefault (System.Runtime.InteropServices)
+        // — ONE hash lookup total. It returns a `ref` to the value slot, adding the key with default(T)
+        // (null) if missing; `??=` then creates the list in place. Don't Add/Remove keys while holding the ref.
+        var groupsByFirstLetter = new Dictionary<char, List<string>>();
+        foreach (var word in new[] { "eat", "tea", "tan", "at", "bat" })
+        {
+            ref var slot = ref System.Runtime.InteropServices.CollectionsMarshal.GetValueRefOrAddDefault(groupsByFirstLetter, word[0], out _);
+            slot ??= [];
+            slot.Add(word);
+        }
+        Console.WriteLine($"Group by first letter via CollectionsMarshal.GetValueRefOrAddDefault: {string.Join(" | ", groupsByFirstLetter.Select(kvp => $"{kvp.Key}: [{string.Join(", ", kvp.Value)}]"))}");
+
         // Count (not Length) — Dictionary<K,V> implements ICollection<KeyValuePair<K,V>>, so Count is
         // an O(1) field read, same as List<T>.Count. LINQ's Count() extension also takes the O(1)
         // fast path here for the same reason (see ListsDemo for when Count() has to enumerate instead).

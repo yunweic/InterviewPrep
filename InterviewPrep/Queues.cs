@@ -46,5 +46,46 @@
         var copySource = new Queue<int>([1, 2, 3]);
         var queueCopy = new Queue<int>(copySource);
         Console.WriteLine($"Queue copy preserves dequeue order — original: {string.Join(", ", copySource)}, copy: {string.Join(", ", queueCopy)}");
+
+        // two ways to iterate a Queue, and they're NOT the same:
+        //   - foreach: O(n), front-to-back, READ-ONLY. Nothing is removed, so Count is unchanged afterward.
+        //   - while (TryDequeue(...)): O(n), same order, but DESTRUCTIVE. It empties the queue as it goes.
+        var iterQueue = new Queue<int>([1, 2, 3]);
+        Console.WriteLine($"foreach (read-only): {string.Join(", ", iterQueue)}, Count after: {iterQueue.Count}");
+
+        var drained = new List<int>();
+        while (iterQueue.TryDequeue(out int front))
+        {
+            drained.Add(front);
+        }
+        Console.WriteLine($"while (TryDequeue) drain: {string.Join(", ", drained)}, Count after: {iterQueue.Count}");
+
+        // BFS is why the while loop matters: you Enqueue NEW items while processing, which is legal
+        // in a while/Dequeue loop but throws InvalidOperationException inside a foreach over the queue.
+        // Here, starting from 1, each n enqueues 2n while it's still < 10.
+        var bfsQueue = new Queue<int>([1]);
+        var visitOrder = new List<int>();
+        while (bfsQueue.TryDequeue(out int current))
+        {
+            visitOrder.Add(current);
+            if (current * 2 < 10)
+            {
+                bfsQueue.Enqueue(current * 2); // modifying mid-loop is fine here
+            }
+        }
+        Console.WriteLine($"BFS-style while (TryDequeue) + Enqueue: {string.Join(", ", visitOrder)}");
+
+        var modifyQueue = new Queue<int>([1, 2]);
+        try
+        {
+            foreach (var item in modifyQueue)
+            {
+                modifyQueue.Enqueue(item * 10);
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"Enqueue inside foreach threw InvalidOperationException: {ex.Message}");
+        }
     }
 }

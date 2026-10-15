@@ -51,5 +51,34 @@
         // to copy a Stack while preserving its pop order, reverse the enumeration first (O(n) either way)
         var orderPreservingCopy = new Stack<int>(copySource.Reverse());
         Console.WriteLine($"orderPreservingCopy pop order (matches copySource): {string.Join(", ", orderPreservingCopy)}");
+
+        // two ways to iterate a Stack, and they're NOT the same:
+        //   - foreach: O(n), top-to-bottom, READ-ONLY. Nothing is removed, so Count is unchanged afterward.
+        //   - while (TryPop(...)): O(n), same order, but DESTRUCTIVE. It empties the stack as it goes.
+        //     This is the usual LeetCode loop, e.g. popping everything left at the end of a monotonic-stack pass.
+        var iterStack = new Stack<int>([1, 2, 3]);
+        Console.WriteLine($"foreach (read-only): {string.Join(", ", iterStack)}, Count after: {iterStack.Count}");
+
+        var drained = new List<int>();
+        while (iterStack.TryPop(out int top))
+        {
+            drained.Add(top);
+        }
+        Console.WriteLine($"while (TryPop) drain: {string.Join(", ", drained)}, Count after: {iterStack.Count}");
+
+        // gotcha: Push/Pop INSIDE a foreach over the same stack throws InvalidOperationException
+        // ("Collection was modified"). If you need to modify as you go, use the while/TryPop loop instead.
+        var modifyStack = new Stack<int>([1, 2]);
+        try
+        {
+            foreach (var item in modifyStack)
+            {
+                modifyStack.Push(item * 10);
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"Push inside foreach threw InvalidOperationException: {ex.Message}");
+        }
     }
 }

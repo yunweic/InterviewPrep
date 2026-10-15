@@ -52,5 +52,77 @@
         var setToHashSet = mySet.ToHashSet();
         HashSet<int> setSpread = [.. mySet];
         Console.WriteLine($"Copies — ctor: {string.Join(", ", setCopyCtor)}, ToHashSet(): {string.Join(", ", setToHashSet)}, [..spread]: {string.Join(", ", setSpread)}");
+
+        // iterating — foreach is the only direct way, O(n) total. A HashSet has NO index:
+        // `mySet[0]` doesn't compile, and there's no for-loop over it. mySet.ElementAt(i) (LINQ)
+        // compiles, but it walks from the start every call, so it's O(i) per call, O(n^2) in a loop.
+        // Order is NOT guaranteed: it often looks like insertion order for small int sets, but
+        // don't rely on that. Use SortedSet (below) or sort a copy if order matters.
+        foreach (var item in mySet)
+        {
+            Console.WriteLine($"foreach over mySet: {item}");
+        }
+
+        // the classic LeetCode set-iteration pattern, "Longest Consecutive Sequence": loop over the
+        // set, and only start counting from numbers that begin a run (num - 1 not in the set).
+        // Each number is visited by the inner while at most once overall, so it's O(n), not O(n^2).
+        HashSet<int> consecutive = [100, 4, 200, 1, 3, 2];
+        var longest = 0;
+        foreach (var num in consecutive)
+        {
+            if (consecutive.Contains(num - 1))
+            {
+                continue; // not the start of a run, so a smaller number will count it
+            }
+
+            var length = 1;
+            while (consecutive.Contains(num + length))
+            {
+                length++;
+            }
+
+            longest = Math.Max(longest, length);
+        }
+        Console.WriteLine($"Longest consecutive run in {{100, 4, 200, 1, 3, 2}} (foreach + Contains): {longest}");
+
+        // gotcha: Add-ing to a set INSIDE its own foreach throws InvalidOperationException
+        // ("Collection was modified"). Remove inside foreach does NOT throw on modern .NET (allowed
+        // for HashSet/Dictionary since .NET Core 3.0+), but List<T>.Remove inside foreach still
+        // throws, so the fixes below are the habits that are safe for every collection.
+        HashSet<int> modifySet = [1, 2, 3];
+        try
+        {
+            foreach (var x in modifySet)
+            {
+                modifySet.Add(x + 10);
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"Add inside foreach threw InvalidOperationException: {ex.Message}");
+        }
+
+        // fix 1: RemoveWhere(predicate), which removes every match in one O(n) pass and returns the count removed
+        HashSet<int> removeWhereSet = [1, 2, 3, 4, 5, 6];
+        var removedCount = removeWhereSet.RemoveWhere(x => x % 2 == 0);
+        Console.WriteLine($"RemoveWhere(x => x % 2 == 0) removed {removedCount}: {string.Join(", ", removeWhereSet)}");
+
+        // fix 2: iterate over a COPY ([.. set] or set.ToList()) and modify the original. Costs an
+        // O(n) copy, but it's the only option when you need to Add while iterating.
+        HashSet<int> copyLoopSet = [1, 2, 3, 4, 5, 6];
+        foreach (var x in copyLoopSet.ToList())
+        {
+            if (x % 2 == 0)
+            {
+                copyLoopSet.Remove(x);
+            }
+        }
+        Console.WriteLine($"Remove while iterating a ToList() copy: {string.Join(", ", copyLoopSet)}");
+
+        // SortedSet<T> — a balanced tree (Add/Remove/Contains O(log n), vs O(1) for HashSet), but
+        // foreach is GUARANTEED to go in ascending order, and Min/Max are O(log n) reads.
+        // .Reverse() iterates descending (the instance method on SortedSet, not a LINQ copy).
+        SortedSet<int> sortedSet = [5, 1, 4, 2, 3];
+        Console.WriteLine($"SortedSet foreach (ascending): {string.Join(", ", sortedSet)}, .Reverse(): {string.Join(", ", sortedSet.Reverse())}, Min: {sortedSet.Min}, Max: {sortedSet.Max}");
     }
 }

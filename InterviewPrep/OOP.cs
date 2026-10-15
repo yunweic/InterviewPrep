@@ -107,6 +107,36 @@ public class Widget : IIdentifiable
     string IIdentifiable.Id => "widget-1"; // note: no `public` modifier on an explicit implementation
 }
 
+// composition — an interface-typed field/property ("HAS-A") instead of implementing the interface
+// ("IS-A"). Car doesn't implement IEngine itself; it HOLDS some IEngine and delegates to it, so
+// which engine it uses is decided by whoever constructs the Car (or swapped later), not baked
+// into Car's class definition.
+public interface IEngine
+{
+    string Start();
+}
+
+public class GasEngine : IEngine
+{
+    public string Start() => "Vroom (gas)";
+}
+
+public class ElectricEngine : IEngine
+{
+    public string Start() => "Hum (electric)";
+}
+
+// a class can do both: Car IS-A IMovable (implements it) and HAS-A IEngine (holds it)
+public class Car(IEngine engine) : IMovable
+{
+    // property, not a private field, because callers are allowed to swap the engine at runtime.
+    // If it should be fixed after construction and hidden, use a private field instead:
+    // `private readonly IEngine _engine = engine;` (or just use the primary-constructor parameter).
+    public IEngine Engine { get; set; } = engine;
+
+    public void Move() => Console.WriteLine($"Car moves: {Engine.Start()}"); // delegates to whichever engine it holds
+}
+
 // overriding ToString/Equals/GetHashCode — the contract every LeetCode-style "design a class" question
 // eventually runs into: if you override Equals, you MUST also override GetHashCode (equal objects must
 // report the same hash code), or the type silently breaks inside Dictionary<K,V>/HashSet<T>.
@@ -168,6 +198,20 @@ public static class OOPDemo
         // widget.Id; // ❌ would not compile — Id isn't part of Widget's public surface
         IIdentifiable identifiable = widget; // ...only through an interface-typed reference
         Console.WriteLine($"((IIdentifiable)widget).Id via explicit implementation: {identifiable.Id}");
+
+        // composition — the SAME Car class gets different behavior depending on the IEngine passed in,
+        // and the engine can be swapped at runtime. With inheritance you'd need a GasCar and an
+        // ElectricCar subclass, and an object can never change its class after it's created.
+        var car = new Car(new GasEngine());
+        car.Move();
+        car.Engine = new ElectricEngine(); // swap behavior at runtime through the interface-typed property
+        car.Move();
+
+        // you already use this pattern in LeetCode: Dictionary/HashSet hold an IEqualityComparer<T>
+        // and SortedSet/PriorityQueue hold an IComparer<T>, passed in through the constructor. The
+        // collection's code stays the same; the comparer you pass in decides how it compares keys.
+        var caseInsensitive = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) { ["Apple"] = 1 };
+        Console.WriteLine($"Dictionary with injected StringComparer.OrdinalIgnoreCase — ContainsKey(\"APPLE\"): {caseInsensitive.ContainsKey("APPLE")}");
 
         // static members — accessed via the TYPE, shared across every instance
         _ = new Counter();

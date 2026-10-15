@@ -37,5 +37,26 @@
         var words = new List<string> { "banana", "kiwi", "apple" };
         words.Sort((a, b) => a.Length - b.Length); // shortest first
         Console.WriteLine($"Sort by length: {string.Join(", ", words)}");
+
+        // gotcha: the (a, b) => a - b comparer can OVERFLOW on large values. int.MinValue - 1 wraps
+        // around to int.MaxValue, so the sign comes out wrong and the sort silently misorders.
+        // a.CompareTo(b) (or b.CompareTo(a) for descending) never overflows, so use it when values
+        // can be near int.MinValue/MaxValue.
+        int[] extremes = [int.MaxValue, -1, int.MinValue, 0];
+        Array.Sort(extremes, (a, b) => a.CompareTo(b));
+        Console.WriteLine($"Array.Sort with a.CompareTo(b) (overflow-safe): {string.Join(", ", extremes)}");
+
+        // sort only a RANGE in place: Array.Sort(arr, startIndex, length), O(k log k) for k elements.
+        // Example: "Next Permutation" sorts (or reverses) just the suffix.
+        int[] partial = [9, 8, 5, 3, 1, 2];
+        Array.Sort(partial, 2, 4); // sorts indices 2..5 only
+        Console.WriteLine($"Array.Sort(arr, 2, 4) (sort indices 2..5 only): {string.Join(", ", partial)}");
+
+        // Array.Sort(keys, items) sorts BOTH arrays by the keys array: two parallel arrays stay
+        // aligned without building tuples (e.g. sort names by their scores)
+        int[] scores = [90, 70, 85];
+        string[] names = ["Ann", "Bob", "Cat"];
+        Array.Sort(scores, names);
+        Console.WriteLine($"Array.Sort(keys, items) — scores: {string.Join(", ", scores)}, names aligned: {string.Join(", ", names)}");
     }
 }
